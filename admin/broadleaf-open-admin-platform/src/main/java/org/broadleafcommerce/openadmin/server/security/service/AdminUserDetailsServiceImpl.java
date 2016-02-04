@@ -21,6 +21,7 @@ package org.broadleafcommerce.openadmin.server.security.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -49,7 +50,9 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
         if (adminUser == null || adminUser.getActiveStatusFlag() == null || !adminUser.getActiveStatusFlag()) {
             throw new UsernameNotFoundException("The user was not found");
         }
-
+        if(!validateRole(adminUser.getAllRoles())){
+            throw new UsernameNotFoundException("The user was not found");
+        }
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         for (AdminRole role : adminUser.getAllRoles()) {
             for (AdminPermission permission : role.getAllPermissions()) {
@@ -75,6 +78,15 @@ public class AdminUserDetailsServiceImpl implements UserDetailsService {
             authorities.add(new GrantedAuthorityImpl(perm));
         }
         return new AdminUserDetails(adminUser.getId(), username, adminUser.getPassword(), true, true, true, true, authorities);
+    }
+
+    /***
+     * check the user's role, decide the user have the right to login
+     * @param roles
+     * @return
+     */
+    protected boolean validateRole(Set<AdminRole> roles) {
+        return true;
     }
 
 }
